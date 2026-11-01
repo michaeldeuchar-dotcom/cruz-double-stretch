@@ -19,6 +19,7 @@ canvas{display:block}
 #A{right:calc(128px + env(safe-area-inset-right));bottom:calc(132px + env(safe-area-inset-bottom));background:#16a34a;font-size:18px}
 #H{display:none!important}
 #U{right:calc(14px + env(safe-area-inset-right));bottom:calc(132px + env(safe-area-inset-bottom));background:#0891b2;font-size:16px}
+#BR{left:calc(128px + env(safe-area-inset-left));bottom:calc(132px + env(safe-area-inset-bottom));background:#1e5bd8;font-size:16px;display:none}
 #D{left:calc(14px + env(safe-area-inset-left));bottom:calc(132px + env(safe-area-inset-bottom));background:#db2777}
 canvas{touch-action:none}
 #S{top:calc(12px + env(safe-area-inset-top));right:calc(14px + env(safe-area-inset-right));background:#8a2be2}
@@ -51,7 +52,7 @@ a[href*="netlify"],#netlify-badge,[class*="netlify-badge"],iframe[src*="netlify"
 </style></head><body>
 <div id="banner">Cruz's Double Stretch Trailer</div><div id="hud"></div>
 <div class="btn" id="L">◀ LEFT</div><div class="btn" id="R">RIGHT ▶</div>
-<div class="btn" id="G">GO</div><div class="btn" id="B">BACK</div><div class="btn" id="H">HITCH 🔗</div><div class="btn" id="S">OUT 🚶</div><div class="btn" id="A">GROW ↔️</div><div class="btn" id="U">UNHOOK ATV 🔒</div><div class="btn" id="D">SLIDE 💨</div>
+<div class="btn" id="G">GO</div><div class="btn" id="B">BACK</div><div class="btn" id="H">HITCH 🔗</div><div class="btn" id="S">OUT 🚶</div><div class="btn" id="A">GROW ↔️</div><div class="btn" id="U">UNHOOK ATV 🔒</div><div class="btn" id="BR">🏍️<br>BRING ATV</div><div class="btn" id="D">SLIDE 💨</div>
 <div id="title"><div id="tname">Cruz's Double Stretch Trailer</div><div style="font-size:70px">🚛 ↔️ ↔️ 🏍️🏍️ 🏠</div><div style="font-size:26px">Tap the screen to hook up BOTH trailers!</div><button id="play">PLAY ▶</button></div>
 <script>
 (function(){var t=document.getElementById('title'),b=document.getElementById('play');
@@ -106,7 +107,7 @@ for(const[x,y,z,r]of[[-9,10,-6,3],[9,10,-6,3.4],[0,11.5,-5,3],[-5,11,6,3.6],[6,1
 const caveTxt=(()=>{const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');x.fillStyle='#ffd400';x.font='bold 44px sans-serif';x.textAlign='center';x.fillText('BATCAVE',128,46);const m=new THREE.Mesh(new THREE.PlaneGeometry(6,1.5),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true}));m.position.set(0,7.2,-7.6);m.rotation.y=Math.PI;cave.add(m)})();
 for(const[x,z,c]of[[-6.5,-5,0xffd400],[6.5,-5,0xffd400],[-6.5,4,0x33aaff],[6.5,4,0x33aaff],[0,7,0xffd400]]){const b=new THREE.Mesh(new THREE.SphereGeometry(.45,10,8),new THREE.MeshBasicMaterial({color:c}));b.position.set(x,6.5,z);cave.add(b);const l=new THREE.PointLight(c,1.2,14);l.position.set(x,6,z);cave.add(l)}
 for(const sx of[-3,3]){const st=box(.4,.1,10,0xffd400,cave);st.position.set(sx,.12,0)}
-const Q=mkAtv(-3.5,10),Q2=mkAtv(CX,CZ+2);Q.h=Q.mh=0;Q2.h=Q2.mh=Math.PI;
+const Q=mkAtv(-3.5,10),Q2=mkAtv(CX,CZ-4.5);Q.h=Q.mh=0;Q2.h=Q2.mh=Math.PI;
 // WALKER
 const W={on:false,x:0,z:0,h:0,y:0,lvl:0},walker=new THREE.Group();scene.add(walker);walker.visible=false;
 box(.8,1,.5,0x1e5bd8,walker).position.y=1.3;const head=new THREE.Mesh(new THREE.SphereGeometry(.38,12,10),M(0xf1c27d));head.position.y=2.2;walker.add(head);
@@ -152,6 +153,9 @@ let SL=0;{const e=$('D');const on=v=>ev=>{ev.preventDefault();SL=v;e.classList.t
 addEventListener('keydown',e=>{if(e.key=='u')unhookAtv();if(e.key==' ')SL=1});addEventListener('keyup',e=>{if(e.key==' ')SL=0});
 const skids=[];const skM=new THREE.MeshBasicMaterial({color:0x332211,transparent:true,opacity:.6});
 function skid(q){for(const sx of[-.85,.85]){const p=toW(q,sx,-.9);const m=new THREE.Mesh(new THREE.PlaneGeometry(.4,.6),skM);m.rotation.x=-Math.PI/2;m.position.set(p.x,.03,p.z);scene.add(m);skids.push(m);if(skids.length>160)scene.remove(skids.shift())}}
+function bringAtv(){if(!W.on){say('Get OUT first 🚶');return}const f=QS.filter(q=>!q.lock).sort((a,b)=>dist(W,a)-dist(W,b))[0];if(!f){say('No free ATV');return}
+ const p=toW(W,0,3);f.x=p.x;f.z=p.z;f.h=f.mh=W.h;f.v=0;f.y=W.y>.5?0:0;say('Here is your ATV! Tap IN 🏍️',3)}
+tap('BR',bringAtv);addEventListener('keydown',e=>{if(e.key=='b')bringAtv()});
 tap('U',unhookAtv);tap('H',hitch);tap('S',inOut);tap('A',grow);
 {const cv=R.domElement,rc=new THREE.Raycaster(),gp=new THREE.Plane(new THREE.Vector3(0,1,0),0);let dT=null,drag=false,t0=0,x0=0,y0=0;
  const ray=e=>{rc.setFromCamera(new THREE.Vector2(e.clientX/innerWidth*2-1,-e.clientY/innerHeight*2+1),cam)};
@@ -199,10 +203,10 @@ function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
  else{const o=V(),b=act=='semi'?(10+chain().length*7):9;cx=o.x-Math.sin(o.h)*b;cy=act=='semi'?(9+chain().length*2):5;cz=o.z-Math.cos(o.h)*b;lx=o.x;ly=1.5;lz=o.z}
  cam.position.lerp(new THREE.Vector3(cx,cy,cz),window.__camOv?1:.12);cam.lookAt(lx,ly,lz);
  $('S').textContent=W.on?(Math.min(dist(W,S),dist(W,Q),dist(W,Q2))<5?'IN '+(dist(W,S)<Math.min(dist(W,Q),dist(W,Q2))?'🚛':'🏍️'):'IN'):'OUT 🚶';
- {const qs=act=='semi'?QS:[curQ()];$('U').innerHTML=qs.some(q=>q.lock)?'UNHOOK<br>ATV 🔒':'ATV<br>FREE 🔓';$('D').style.display=(!W.on&&act!='semi')?'flex':'none';if(curQ().sliding&&act!='semi'&&!W.on)$('hud').dataset.s=1}
+ {const qs=act=='semi'?QS:[curQ()];$('U').innerHTML=qs.some(q=>q.lock)?'UNHOOK<br>ATV 🔒':'ATV<br>FREE 🔓';$('BR').style.display=W.on?'flex':'none';$('D').style.display=(!W.on&&act!='semi')?'flex':'none';if(curQ().sliding&&act!='semi'&&!W.on)$('hud').dataset.s=1}
  $('H').textContent=(TRS[chain().length]&&dist(chainEnd(),TRS[chain().length])<4)?'HITCH 🔗':chain().length?'UNHOOK 🔓':'HITCH 🔗';
  if(msgT>0)msgT-=dt;$('hud').textContent=msgT>0?msg:('Trailers: '+TRS.map(T=>T.len>=FIT-.01?'BIG ✅':Math.round((T.len-1.6)/(FIT-1.6)*100)+'%').join(' + ')+' | Hooked: '+chain().length+'/2');
  R.render(scene,cam);requestAnimationFrame(loop)}
 TRS.forEach(layTrailer);requestAnimationFrame(loop);
-window.__g={get SL(){return SL},set SL(v){SL=v},skids,unhookAtv,S,TR,TR2,TRS,Q,Q2,W,chain,hookAll,K,FIT,HX,HZ,FY,hitch,grow,inOut,get act(){return act},set act(v){act=v},cam};
+window.__g={bringAtv,get SL(){return SL},set SL(v){SL=v},skids,unhookAtv,S,TR,TR2,TRS,Q,Q2,W,chain,hookAll,K,FIT,HX,HZ,FY,hitch,grow,inOut,get act(){return act},set act(v){act=v},cam};
 </script></body></html>
