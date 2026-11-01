@@ -17,6 +17,10 @@ canvas{display:block}
 #B{right:calc(128px + env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom));background:#e33}
 #H{right:calc(14px + env(safe-area-inset-right));bottom:calc(132px + env(safe-area-inset-bottom));background:#ff8c00}
 #A{right:calc(128px + env(safe-area-inset-right));bottom:calc(132px + env(safe-area-inset-bottom));background:#16a34a;font-size:18px}
+#H{display:none!important}
+#U{right:calc(14px + env(safe-area-inset-right));bottom:calc(132px + env(safe-area-inset-bottom));background:#0891b2;font-size:16px}
+#D{left:calc(14px + env(safe-area-inset-left));bottom:calc(132px + env(safe-area-inset-bottom));background:#db2777}
+canvas{touch-action:none}
 #S{top:calc(12px + env(safe-area-inset-top));right:calc(14px + env(safe-area-inset-right));background:#8a2be2}
 
 
@@ -47,7 +51,7 @@ a[href*="netlify"],#netlify-badge,[class*="netlify-badge"],iframe[src*="netlify"
 </style></head><body>
 <div id="banner">Cruz's Double Stretch Trailer</div><div id="hud"></div>
 <div class="btn" id="L">◀ LEFT</div><div class="btn" id="R">RIGHT ▶</div>
-<div class="btn" id="G">GO</div><div class="btn" id="B">BACK</div><div class="btn" id="H">HITCH 🔗</div><div class="btn" id="S">OUT 🚶</div><div class="btn" id="A">GROW ↔️</div>
+<div class="btn" id="G">GO</div><div class="btn" id="B">BACK</div><div class="btn" id="H">HITCH 🔗</div><div class="btn" id="S">OUT 🚶</div><div class="btn" id="A">GROW ↔️</div><div class="btn" id="U">UNHOOK ATV 🔒</div><div class="btn" id="D">SLIDE 💨</div>
 <div id="title"><div id="tname">Cruz's Double Stretch Trailer</div><div style="font-size:70px">🚛 ↔️ ↔️ 🏍️🏍️ 🏠</div><div style="font-size:26px">Tap the screen to hook up BOTH trailers!</div><button id="play">PLAY ▶</button></div>
 <script>
 (function(){var t=document.getElementById('title'),b=document.getElementById('play');
@@ -85,10 +89,10 @@ function layTrailer(T){const L=T.len,z0=-2,z1=-2-L;T.deck.scale.z=L;T.deck.posit
  const wz=(z0+z1)/2;T.tw.position.z=wz;T.fend.position.set(0,TY-.2,wz);T.ramp.position.set(0,TY/2,z1-1.05);T.ramp.rotation.x=-Math.atan2(TY,2.2)}
 const trRear=T=>toW(T,0,-2-T.len-2.3);
 // ATVs (blue)
-const QS=[];function mkAtv(x,z){const Q={x,z,h:Math.PI,v:0,y:0,lock:false,lz:0,on:-1},a=new THREE.Group();scene.add(a);Q.g=a;
+const QS=[];function mkAtv(x,z){const Q={x,z,h:Math.PI,mh:Math.PI,v:0,y:0,lock:false,lz:0,on:null},a=new THREE.Group();scene.add(a);Q.g=a;
  box(1.6,.6,2.6,0x1e5bd8,a).position.y=1;box(.9,.5,1,0x111111,a).position.set(0,1.45,-.3);box(1.4,.1,.2,0x888888,a).position.set(0,1.7,.9);
  for(const z of[.9,-.9])for(const sx of[-.85,.85])wheel(.45,.4,a,sx,.45,z);QS.push(Q);return Q}
-const Q=mkAtv(8,-6),Q2=mkAtv(12,-6);
+const Q=mkAtv(0,9),Q2=mkAtv(6,4);Q.h=Q.mh=0;Q2.h=Q2.mh=0;
 // WALKER
 const W={on:false,x:0,z:0,h:0,y:0,lvl:0},walker=new THREE.Group();scene.add(walker);walker.visible=false;
 box(.8,1,.5,0x1e5bd8,walker).position.y=1.3;const head=new THREE.Mesh(new THREE.SphereGeometry(.38,12,10),M(0xf1c27d));head.position.y=2.2;walker.add(head);
@@ -128,12 +132,30 @@ function grow(){if(TRS.every(T=>T.tgt>=FIT)){say('Both long enough for the ATVs!
 const curQ=()=>act=='atv'?Q:Q2;const V=()=>act=='semi'?S:curQ();
 function inOut(){if(!W.on){const v=V();W.on=true;W.lvl=0;W.y=0;const p=toW(v,act=='semi'?2.6:1.8,0);W.x=p.x;W.z=p.z;W.h=v.h;say('Walk around! 🚶 Find the house!')}
  else{const c=[['semi',dist(W,S)],['atv',dist(W,Q)],['atv2',dist(W,Q2)]].sort((a,b)=>a[1]-b[1])[0];if(c[1]<5&&W.y<.5){W.on=false;act=c[0];say(act=='semi'?'Driving the red semi! 🚛':'Riding a blue ATV! 🏍️')}else say('Walk to the semi or an ATV to get IN')}}
-tap('H',hitch);tap('S',inOut);tap('A',grow);
-{const cv=R.domElement;let t0=0,x0=0,y0=0;const st=(x,y)=>{t0=Date.now();x0=x;y0=y},en=(x,y)=>{if(started&&Date.now()-t0<400&&Math.hypot(x-x0,y-y0)<20)hookAll()};
- let lastT=0;cv.addEventListener('touchstart',e=>{const p=e.changedTouches[0];st(p.clientX,p.clientY)},{passive:true});
- cv.addEventListener('touchend',e=>{lastT=Date.now();const p=e.changedTouches[0];en(p.clientX,p.clientY)});
- cv.addEventListener('mousedown',e=>{if(Date.now()-lastT>600)st(e.clientX,e.clientY)});cv.addEventListener('mouseup',e=>{if(Date.now()-lastT>600)en(e.clientX,e.clientY)});}
-function drive(o,dt,max){const t=(K.G?1:0)-(K.B?1:0);o.v+=(t*max-o.v)*Math.min(1,dt*(t?1.6:2.5));const s=(K.L?1:0)-(K.R?1:0);if(Math.abs(o.v)>.3)o.h+=s*dt*1.6*Math.sign(o.v);o.x+=Math.sin(o.h)*o.v*dt;o.z+=Math.cos(o.h)*o.v*dt;const r=Math.hypot(o.x,o.z);if(r>150){o.x*=150/r;o.z*=150/r}}
+function freeAtv(q){const T=q.on;q.lock=false;q.on=null;const p=toW(T,0,-2-T.len-3.6);q.x=p.x;q.z=p.z;q.h=q.mh=T.h+Math.PI;q.y=0;q.v=5}
+function unhookAtv(){const qs=act=='semi'?QS.filter(q=>q.lock):[curQ()].filter(q=>q.lock);if(!qs.length){say('No ATV locked on a trailer');return}qs.forEach(freeAtv);say('ATV UNHOOKED! Rolling off! 🔓🏍️',3)}
+let SL=0;{const e=$('D');const on=v=>ev=>{ev.preventDefault();SL=v;e.classList.toggle('on',!!v)};e.addEventListener('touchstart',on(1),{passive:false});e.addEventListener('touchend',on(0),{passive:false});e.addEventListener('touchcancel',on(0));e.addEventListener('mousedown',on(1));e.addEventListener('mouseup',on(0));e.addEventListener('mouseleave',on(0))}
+addEventListener('keydown',e=>{if(e.key=='u')unhookAtv();if(e.key==' ')SL=1});addEventListener('keyup',e=>{if(e.key==' ')SL=0});
+const skids=[];const skM=new THREE.MeshBasicMaterial({color:0x332211,transparent:true,opacity:.6});
+function skid(q){for(const sx of[-.85,.85]){const p=toW(q,sx,-.9);const m=new THREE.Mesh(new THREE.PlaneGeometry(.4,.6),skM);m.rotation.x=-Math.PI/2;m.position.set(p.x,.03,p.z);scene.add(m);skids.push(m);if(skids.length>160)scene.remove(skids.shift())}}
+tap('U',unhookAtv);tap('H',hitch);tap('S',inOut);tap('A',grow);
+{const cv=R.domElement,rc=new THREE.Raycaster(),gp=new THREE.Plane(new THREE.Vector3(0,1,0),0);let dT=null,drag=false,t0=0,x0=0,y0=0;
+ const ray=e=>{rc.setFromCamera(new THREE.Vector2(e.clientX/innerWidth*2-1,-e.clientY/innerHeight*2+1),cam)};
+ const pick=e=>{ray(e);for(const h of rc.intersectObjects(TRS.map(T=>T.g),true)){let o=h.object;while(o&&!TRS.some(T=>T.g===o))o=o.parent;if(o)return TRS.find(T=>T.g===o)}return null};
+ const unhookFrom=T=>{const c=chain(),i=c.indexOf(T);if(i<0)return 0;for(let j=i;j<c.length;j++)c[j].hit=false;return c.length-i};
+ window.__pt={pick,unhookFrom};
+ cv.addEventListener('pointerdown',e=>{if(!started)return;dT=pick(e);drag=false;t0=Date.now();x0=e.clientX;y0=e.clientY});
+ cv.addEventListener('pointermove',e=>{if(!dT)return;if(!drag&&Math.hypot(e.clientX-x0,e.clientY-y0)>15){drag=true;unhookFrom(dT);say('Dragging trailer! Drop it behind the semi 👆')}
+  if(drag){ray(e);const v=new THREE.Vector3();if(rc.ray.intersectPlane(gp,v)){dT.x=v.x;dT.z=v.z;const ce=chainEnd();const dx=ce.x-v.x,dz=ce.z-v.z;if(Math.hypot(dx,dz)>1)dT.h=Math.atan2(dx,dz)}}});
+ cv.addEventListener('pointerup',e=>{const T=dT;dT=null;if(!started)return;
+  if(T&&drag){drag=false;if(dist(chainEnd(),T)<7){const n=chain().length;TRS.splice(TRS.indexOf(T),1);TRS.splice(n,0,T);T.hit=true;snap();if(T.tgt<FIT)growT(T);say('Snap! Hooked on! 🔗',2.5)}else say('Drop it closer to the semi!');return}
+  if(Date.now()-t0>500||Math.hypot(e.clientX-x0,e.clientY-y0)>15)return;
+  if(T&&T.hit){const n=unhookFrom(T);say(n>1?'Unhooked '+n+' trailers! 🔓':'Unhooked! 🔓')}else hookAll()});
+ cv.addEventListener('pointercancel',()=>{dT=null;drag=false});}
+
+function drive(o,dt,max){if(o.mh!==undefined){const t=(K.G?1:0)-(K.B?1:0);o.v+=(t*max-o.v)*Math.min(1,dt*(t?1.6:(SL?.6:2.5)));const s=(K.L?1:0)-(K.R?1:0);const sl=SL&&Math.abs(o.v)>2;
+  if(Math.abs(o.v)>.3)o.h+=s*dt*(sl?3.4:1.6)*Math.sign(o.v);o.mh+=(o.h-o.mh)*Math.min(1,dt*(sl?1.5:12));o.sliding=sl&&Math.abs(o.h-o.mh)>.15;if(o.sliding)skid(o);
+  o.x+=Math.sin(o.mh)*o.v*dt;o.z+=Math.cos(o.mh)*o.v*dt;const r=Math.hypot(o.x,o.z);if(r>150){o.x*=150/r;o.z*=150/r}return}const t=(K.G?1:0)-(K.B?1:0);o.v+=(t*max-o.v)*Math.min(1,dt*(t?1.6:2.5));const s=(K.L?1:0)-(K.R?1:0);if(Math.abs(o.v)>.3)o.h+=s*dt*1.6*Math.sign(o.v);o.x+=Math.sin(o.h)*o.v*dt;o.z+=Math.cos(o.h)*o.v*dt;const r=Math.hypot(o.x,o.z);if(r>150){o.x*=150/r;o.z*=150/r}}
 const inHouse=(x,z)=>{const l={x:x-HX,z:z-HZ};return l.x>-7&&l.x<7&&l.z>-5&&l.z<5};
 function walk(dt){const f=(K.G?1:0)-(K.B?1:0);W.h+=((K.L?1:0)-(K.R?1:0))*dt*2.5;let nx=W.x+Math.sin(W.h)*f*6*dt,nz=W.z+Math.cos(W.h)*f*6*dt;
  const lx=nx-HX,lz=nz-HZ,inS=lx>=-.2&&lx<6.2&&lz>2&&lz<4.6&&inHouse(nx,nz);
@@ -143,17 +165,17 @@ function walk(dt){const f=(K.G?1:0)-(K.B?1:0);W.h+=((K.L?1:0)-(K.R?1:0))*dt*2.5;
   if(inS){W.y=Math.max(0,(6-lx)/6*FY);if(lx<.1){W.lvl=1;W.y=FY;say('Upstairs! 🛏️🧸')}}else if(!(lx<0&&inHouse(W.x,W.z)&&W.y>.5))W.y=0}
  walker.position.set(W.x,W.y,W.z);walker.rotation.y=W.h;const mv=f!=0;legs[0].rotation.x=mv?Math.sin(performance.now()/100)*.6:0;legs[1].rotation.x=-legs[0].rotation.x}
 function atvTrailer(Q){let y=0;for(let i=0;i<TRS.length;i++){const T=TRS[i];const l=toL(T,Q.x,Q.z);const z1=-2-T.len;const onDeck=Math.abs(l.lx)<1.3&&l.lz<-2&&l.lz>z1;const onRamp=Math.abs(l.lx)<1.3&&l.lz<=z1&&l.lz>z1-2.2;
- if(onRamp){y=TY*(1-(z1-l.lz)/2.2);break}else if(onDeck){y=TY;const taken=QS.some(o=>o!==Q&&o.lock&&o.on==i);
-  if(!taken&&T.len>=FIT-.01&&l.lz>z1+1.3&&l.lz<-3.2&&!Q.lock&&Q.v>0&&Math.abs(Math.sin(Q.h-T.h))<.5){Q.lock=true;Q.on=i;Q.v=0;Q.lz=l.lz;Q.h=T.h;say('LOCKED ON trailer '+(i+1)+'! It barely fits! 🔒🏍️',3)}
+ if(onRamp){y=TY*(1-(z1-l.lz)/2.2);break}else if(onDeck){y=TY;const taken=QS.some(o=>o!==Q&&o.lock&&o.on===T);
+  if(!taken&&T.len>=FIT-.01&&l.lz>z1+1.3&&l.lz<-3.2&&!Q.lock&&Q.v>0&&Math.abs(Math.sin(Q.h-T.h))<.5){Q.lock=true;Q.on=T;Q.v=0;Q.lz=l.lz;Q.h=Q.mh=T.h;say('LOCKED ON trailer! It barely fits! 🔒🏍️',3)}
   else if(T.len<FIT-.01&&l.lz<-2.3&&Math.random()<.02)say('Too short! Tap GROW ↔️');break}}
  Q.y=y}
 let last=performance.now(),started=false;window.__onPlay=()=>{started=true};
 function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
  for(const T of TRS){if(Math.abs(T.tgt-T.len)>.001){T.len+=Math.sign(T.tgt-T.len)*Math.min(Math.abs(T.tgt-T.len),dt*1.2);T.deck.material.color.setHSL(.6,.75,.45+.1*Math.sin(now/60))}else T.deck.material.color.set(0x1e5bd8);layTrailer(T)}
  if(!W.on&&act=='semi')drive(S,dt,14);
- if(!W.on&&act!='semi'){const q=curQ();if(q.lock&&K.B){q.lock=false;q.on=-1;say('Backing off the trailer!')}if(!q.lock){drive(q,dt,9);atvTrailer(q)}}
+ if(!W.on&&act!='semi'){const q=curQ();if(q.lock&&K.B){q.lock=false;q.on=null;say('Backing off the trailer!')}if(!q.lock){drive(q,dt,9);atvTrailer(q)}}
  {let r=semiRear();for(const T of chain()){const w=toW(T,0,-2-T.len/2),dx=r.x-w.x,dz=r.z-w.z;if(Math.hypot(dx,dz)>0.5)T.h=Math.atan2(dx,dz);T.x=r.x;T.z=r.z;r=trRear(T)}}
- for(const q of QS)if(q.lock){const T=TRS[q.on];const p=toW(T,0,q.lz);q.x=p.x;q.z=p.z;q.h=T.h;q.y=TY;q.v=0}
+ for(const q of QS)if(q.lock){const T=q.on;const p=toW(T,0,q.lz);q.x=p.x;q.z=p.z;q.h=q.mh=T.h;q.y=TY;q.v=0}
  if(W.on)walk(dt);walker.visible=W.on;
  semi.position.set(S.x,0,S.z);semi.rotation.y=S.h;for(const T of TRS){T.g.position.set(T.x,0,T.z);T.g.rotation.y=T.h}for(const q of QS){q.g.position.set(q.x,q.y,q.z);q.g.rotation.y=q.h}
  const inside=W.on&&inHouse(W.x,W.z);roof.visible=!inside;up.visible=!(inside&&W.lvl==0&&W.y<1);
@@ -163,9 +185,10 @@ function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
  else{const o=V(),b=act=='semi'?(10+chain().length*7):9;cx=o.x-Math.sin(o.h)*b;cy=act=='semi'?(9+chain().length*2):5;cz=o.z-Math.cos(o.h)*b;lx=o.x;ly=1.5;lz=o.z}
  cam.position.lerp(new THREE.Vector3(cx,cy,cz),window.__camOv?1:.12);cam.lookAt(lx,ly,lz);
  $('S').textContent=W.on?(Math.min(dist(W,S),dist(W,Q),dist(W,Q2))<5?'IN '+(dist(W,S)<Math.min(dist(W,Q),dist(W,Q2))?'🚛':'🏍️'):'IN'):'OUT 🚶';
+ {const qs=act=='semi'?QS:[curQ()];$('U').innerHTML=qs.some(q=>q.lock)?'UNHOOK<br>ATV 🔒':'ATV<br>FREE 🔓';$('D').style.display=(!W.on&&act!='semi')?'flex':'none';if(curQ().sliding&&act!='semi'&&!W.on)$('hud').dataset.s=1}
  $('H').textContent=(TRS[chain().length]&&dist(chainEnd(),TRS[chain().length])<4)?'HITCH 🔗':chain().length?'UNHOOK 🔓':'HITCH 🔗';
  if(msgT>0)msgT-=dt;$('hud').textContent=msgT>0?msg:('Trailers: '+TRS.map(T=>T.len>=FIT-.01?'BIG ✅':Math.round((T.len-1.6)/(FIT-1.6)*100)+'%').join(' + ')+' | Hooked: '+chain().length+'/2');
  R.render(scene,cam);requestAnimationFrame(loop)}
 TRS.forEach(layTrailer);requestAnimationFrame(loop);
-window.__g={S,TR,TR2,TRS,Q,Q2,W,chain,hookAll,K,FIT,HX,HZ,FY,hitch,grow,inOut,get act(){return act},set act(v){act=v},cam};
+window.__g={get SL(){return SL},set SL(v){SL=v},skids,unhookAtv,S,TR,TR2,TRS,Q,Q2,W,chain,hookAll,K,FIT,HX,HZ,FY,hitch,grow,inOut,get act(){return act},set act(v){act=v},cam};
 </script></body></html>
