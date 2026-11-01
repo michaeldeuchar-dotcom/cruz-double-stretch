@@ -20,6 +20,8 @@ canvas{display:block}
 #H{display:none!important}
 #U{right:calc(14px + env(safe-area-inset-right));bottom:calc(132px + env(safe-area-inset-bottom));background:#0891b2;font-size:16px}
 #BR{left:calc(128px + env(safe-area-inset-left));bottom:calc(132px + env(safe-area-inset-bottom));background:#1e5bd8;font-size:16px;display:none}
+#LT{left:calc(242px + env(safe-area-inset-left));bottom:calc(18px + env(safe-area-inset-bottom));background:#f59e0b;font-size:17px}
+#PW{left:calc(242px + env(safe-area-inset-left));bottom:calc(132px + env(safe-area-inset-bottom));background:#16a34a;font-size:16px;display:none}
 #D{left:calc(14px + env(safe-area-inset-left));bottom:calc(132px + env(safe-area-inset-bottom));background:#db2777}
 canvas{touch-action:none}
 #S{top:calc(12px + env(safe-area-inset-top));right:calc(14px + env(safe-area-inset-right));background:#8a2be2}
@@ -52,7 +54,7 @@ a[href*="netlify"],#netlify-badge,[class*="netlify-badge"],iframe[src*="netlify"
 </style></head><body>
 <div id="banner">Cruz's Double Stretch Trailer</div><div id="hud"></div>
 <div class="btn" id="L">◀ LEFT</div><div class="btn" id="R">RIGHT ▶</div>
-<div class="btn" id="G">GO</div><div class="btn" id="B">BACK</div><div class="btn" id="H">HITCH 🔗</div><div class="btn" id="S">OUT 🚶</div><div class="btn" id="A">GROW ↔️</div><div class="btn" id="U">UNHOOK ATV 🔒</div><div class="btn" id="BR">🏍️<br>BRING ATV</div><div class="btn" id="D">SLIDE 💨</div>
+<div class="btn" id="G">GO</div><div class="btn" id="B">BACK</div><div class="btn" id="H">HITCH 🔗</div><div class="btn" id="S">OUT 🚶</div><div class="btn" id="A">GROW ↔️</div><div class="btn" id="U">UNHOOK ATV 🔒</div><div class="btn" id="BR">🏍️<br>BRING ATV</div><div class="btn" id="LT">💡<br>LIGHTS</div><div class="btn" id="PW">⏻<br>POWER ON</div><div class="btn" id="D">SLIDE 💨</div>
 <div id="title"><div id="tname">Cruz's Double Stretch Trailer</div><div style="font-size:70px">🚛 ↔️ ↔️ 🏍️🏍️ 🏠</div><div style="font-size:26px">Tap the screen to hook up BOTH trailers!</div><button id="play">PLAY ▶</button></div>
 <script>
 (function(){var t=document.getElementById('title'),b=document.getElementById('play');
@@ -156,6 +158,16 @@ function skid(q){for(const sx of[-.85,.85]){const p=toW(q,sx,-.9);const m=new TH
 function bringAtv(){if(!W.on){say('Get OUT first 🚶');return}const f=QS.filter(q=>!q.lock).sort((a,b)=>dist(W,a)-dist(W,b))[0];if(!f){say('No free ATV');return}
  const p=toW(W,0,3);f.x=p.x;f.z=p.z;f.h=f.mh=W.h;f.v=0;f.y=W.y>.5?0:0;say('Here is your ATV! Tap IN 🏍️',3)}
 tap('BR',bringAtv);addEventListener('keydown',e=>{if(e.key=='b')bringAtv()});
+function headlights(g,xs,y,z,inten){const H={on:true,spots:[],lens:[]};const lm=new THREE.MeshBasicMaterial({color:0xfff6c0});H.lm=lm;
+ for(const x of xs){const sp=new THREE.SpotLight(0xfff2cc,inten,38,Math.PI/6.5,.45,1);sp.castShadow=false;sp.position.set(x,y,z);const t=new THREE.Object3D();t.position.set(x*1.4,0,z+14);g.add(t);sp.target=t;g.add(sp);H.spots.push(sp);
+  const l=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.12,14),lm);l.rotation.x=Math.PI/2;l.position.set(x,y,z+.02);g.add(l);H.lens.push(l)}
+ H.set=v=>{H.on=v;H.spots.forEach(sp=>sp.visible=v);lm.color.set(v?0xfff6c0:0x777777)};return H}
+semi.userData.hl=headlights(semi,[-1,1],1.7,4.65,60);for(const q of QS)q.g.userData.hl=headlights(q.g,[-.5,.5],1.1,1.32,30);
+function toggleLights(){if(!W.on&&act!='semi'&&!curQ().pw){say('Turn POWER on first ⏻');return}if(W.on){say('Get in a vehicle for lights');return}const g=act=='semi'?semi:curQ().g;const H=g.userData.hl;H.set(!H.on);say(H.on?'Lights ON 💡':'Lights OFF 🌑')}
+tap('LT',toggleLights);
+for(const q of QS)q.pw=true;
+function togglePower(){if(W.on||act=='semi')return;const q=curQ();q.pw=!q.pw;q.v=0;q.g.userData.hl.set(q.pw);say(q.pw?'Engine ON! Vroom 🏍️':'Engine OFF ⏻')}
+tap('PW',togglePower);addEventListener('keydown',e=>{if(e.key=='p')togglePower()});addEventListener('keydown',e=>{if(e.key=='l'||e.key=='L')toggleLights()});
 tap('U',unhookAtv);tap('H',hitch);tap('S',inOut);tap('A',grow);
 {const cv=R.domElement,rc=new THREE.Raycaster(),gp=new THREE.Plane(new THREE.Vector3(0,1,0),0);let dT=null,drag=false,t0=0,x0=0,y0=0;
  const ray=e=>{rc.setFromCamera(new THREE.Vector2(e.clientX/innerWidth*2-1,-e.clientY/innerHeight*2+1),cam)};
@@ -191,11 +203,11 @@ let last=performance.now(),started=false;window.__onPlay=()=>{started=true};
 function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
  for(const T of TRS){if(Math.abs(T.tgt-T.len)>.001){T.len+=Math.sign(T.tgt-T.len)*Math.min(Math.abs(T.tgt-T.len),dt*1.2);T.deck.material.color.setHSL(.6,.75,.45+.1*Math.sin(now/60))}else T.deck.material.color.set(0x1e5bd8);layTrailer(T)}
  if(!W.on&&act=='semi')drive(S,dt,14);
- if(!W.on&&act!='semi'){const q=curQ();if(q.lock&&K.B){q.lock=false;q.on=null;say('Backing off the trailer!')}if(!q.lock){drive(q,dt,9);atvTrailer(q)}}
+ if(!W.on&&act!='semi'){const q=curQ();if(q.lock&&K.B){q.lock=false;q.on=null;say('Backing off the trailer!')}if(!q.lock&&q.pw){drive(q,dt,9);atvTrailer(q)}else if(!q.pw)q.v=0}
  {let r=semiRear();for(const T of chain()){const w=toW(T,0,-2-T.len/2),dx=r.x-w.x,dz=r.z-w.z;if(Math.hypot(dx,dz)>0.5)T.h=Math.atan2(dx,dz);T.x=r.x;T.z=r.z;r=trRear(T)}}
  for(const q of QS)if(q.lock){const T=q.on;const p=toW(T,0,q.lz);q.x=p.x;q.z=p.z;q.h=q.mh=T.h;q.y=TY;q.v=0}
  if(W.on)walk(dt);walker.visible=W.on;
- semi.position.set(S.x,0,S.z);semi.rotation.y=S.h;for(const T of TRS){T.g.position.set(T.x,0,T.z);T.g.rotation.y=T.h}for(const q of QS){q.g.position.set(q.x,q.y,q.z);q.g.rotation.y=q.h}
+ semi.position.set(S.x,0,S.z);semi.rotation.y=S.h;for(const T of TRS){T.g.position.set(T.x,0,T.z);T.g.rotation.y=T.h}for(const q of QS){const wob=(q.pw&&!W.on&&act!='semi'&&q===curQ())?Math.sin(now/35)*.04:0;q.g.position.set(q.x,q.y+wob,q.z);q.g.rotation.y=q.h}
  const inside=W.on&&inHouse(W.x,W.z);roof.visible=!inside;up.visible=!(inside&&W.lvl==0&&W.y<1);
  let cx,cy,cz,lx,ly,lz;
  if(window.__camOv){[cx,cy,cz,lx,ly,lz]=window.__camOv()}
@@ -203,10 +215,10 @@ function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
  else{const o=V(),b=act=='semi'?(10+chain().length*7):9;cx=o.x-Math.sin(o.h)*b;cy=act=='semi'?(9+chain().length*2):5;cz=o.z-Math.cos(o.h)*b;lx=o.x;ly=1.5;lz=o.z}
  cam.position.lerp(new THREE.Vector3(cx,cy,cz),window.__camOv?1:.12);cam.lookAt(lx,ly,lz);
  $('S').textContent=W.on?(Math.min(dist(W,S),dist(W,Q),dist(W,Q2))<5?'IN '+(dist(W,S)<Math.min(dist(W,Q),dist(W,Q2))?'🚛':'🏍️'):'IN'):'OUT 🚶';
- {const qs=act=='semi'?QS:[curQ()];$('U').innerHTML=qs.some(q=>q.lock)?'UNHOOK<br>ATV 🔒':'ATV<br>FREE 🔓';$('BR').style.display=W.on?'flex':'none';$('D').style.display=(!W.on&&act!='semi')?'flex':'none';if(curQ().sliding&&act!='semi'&&!W.on)$('hud').dataset.s=1}
+ {const qs=act=='semi'?QS:[curQ()];$('U').innerHTML=qs.some(q=>q.lock)?'UNHOOK<br>ATV 🔒':'ATV<br>FREE 🔓';{const g=act=='semi'?semi:curQ().g;$('LT').style.display=W.on?'none':'flex';$('LT').innerHTML=g.userData.hl.on?'💡<br>LIGHTS ON':'🌑<br>LIGHTS OFF'}{const rid=!W.on&&act!='semi';$('PW').style.display=rid?'flex':'none';if(rid){const q=curQ();$('PW').innerHTML=q.pw?'⏻<br>POWER ON':'⏻<br>POWER OFF';$('PW').style.background=q.pw?'#16a34a':'#555'}}$('BR').style.display=W.on?'flex':'none';$('D').style.display=(!W.on&&act!='semi')?'flex':'none';if(curQ().sliding&&act!='semi'&&!W.on)$('hud').dataset.s=1}
  $('H').textContent=(TRS[chain().length]&&dist(chainEnd(),TRS[chain().length])<4)?'HITCH 🔗':chain().length?'UNHOOK 🔓':'HITCH 🔗';
  if(msgT>0)msgT-=dt;$('hud').textContent=msgT>0?msg:('Trailers: '+TRS.map(T=>T.len>=FIT-.01?'BIG ✅':Math.round((T.len-1.6)/(FIT-1.6)*100)+'%').join(' + ')+' | Hooked: '+chain().length+'/2');
  R.render(scene,cam);requestAnimationFrame(loop)}
 TRS.forEach(layTrailer);requestAnimationFrame(loop);
-window.__g={bringAtv,get SL(){return SL},set SL(v){SL=v},skids,unhookAtv,S,TR,TR2,TRS,Q,Q2,W,chain,hookAll,K,FIT,HX,HZ,FY,hitch,grow,inOut,get act(){return act},set act(v){act=v},cam};
+window.__g={togglePower,semi,toggleLights,bringAtv,get SL(){return SL},set SL(v){SL=v},skids,unhookAtv,S,TR,TR2,TRS,Q,Q2,W,chain,hookAll,K,FIT,HX,HZ,FY,hitch,grow,inOut,get act(){return act},set act(v){act=v},cam};
 </script></body></html>
